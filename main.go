@@ -19,7 +19,12 @@ func pedirDadosSite() (string, string) {
 }
 
 func pedirSiteParaLog() internal.Site {
-	sites := internal.ListarSitesDoBanco()
+	sites, err := internal.ListarSitesDoBanco()
+
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(-1)
+	}
 
 	fmt.Println("Sites disponíveis:")
 
@@ -55,6 +60,16 @@ func exibeMenu() {
 }
 
 func main() {
+	fmt.Println("Inicializando Banco de Dados...")
+	err := internal.IniciarBancoDeDados("sitehb.db")
+
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(-1)
+	}
+
+	fmt.Println("Banco de Dados inicializado com sucesso.")
+
 	for {
 		exibeMenu()
 

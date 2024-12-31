@@ -5,22 +5,21 @@ import (
 	"fmt"
 
 	"github.com/google/uuid"
-)
 
-var sitesDatabase []Site
-var logsDatabase []Log
+	_ "github.com/mattn/go-sqlite3"
+)
 
 var db *sql.DB
 
 func IniciarBancoDeDados(caminho string) error {
 	var err error
-	db, err = sql.Open("sqlite", caminho)
+	db, err = sql.Open("sqlite3", caminho)
+
 	if err != nil {
 		return fmt.Errorf("erro ao abrir o banco de dados: %w", err)
 	}
 
-	// Criação das tabelas
-	criarTabelas := `
+	criarTabelasSql := `
 	CREATE TABLE IF NOT EXISTS sites (
 		uuid TEXT PRIMARY KEY,
 		nome TEXT NOT NULL,
@@ -33,7 +32,7 @@ func IniciarBancoDeDados(caminho string) error {
 		FOREIGN KEY(site_uuid) REFERENCES sites(uuid)
 	);`
 
-	_, err = db.Exec(criarTabelas)
+	_, err = db.Exec(criarTabelasSql)
 	if err != nil {
 		return fmt.Errorf("erro ao criar tabelas: %w", err)
 	}
@@ -41,41 +40,84 @@ func IniciarBancoDeDados(caminho string) error {
 	return nil
 }
 
-func CriarSiteNoBanco(nome string, url string) string {
-	uuidCriado := uuid.New().String()
+func CriarSiteNoBanco(nome string, url string) (string, error) {
+	uuid := uuid.New().String()
 
-	site := Site{
-		Uuid: uuidCriado,
-		Nome: nome,
-		Url:  url,
+	sql := `INSERT INTO sites (uuid, nome, url) VALUES (?, ?, ?)`
+
+	_, err := db.Exec(sql, uuid, nome, url)
+
+	if err != nil {
+		return "", fmt.Errorf("erro ao criar site: %w", err)
 	}
 
-	sitesDatabase = append(sitesDatabase, site)
-
-	return uuidCriado
+	return uuid, nil
 }
 
-func ListarSitesDoBanco() []Site {
-	return sitesDatabase
-}
+func ListarSitesDoBanco() ([]Site, error) {
+	sql := `SELECT uuid, nome, url FROM sites`
 
-func CriarLogNoBanco(siteUuid string, texto string) {
-	log := Log{
-		SiteUuid: siteUuid,
-		Texto:    texto,
+	rows, err := db.Query(sql)
+
+	if err != nil {
+		return nil, fmt.Errorf("erro ao listar sites: %w", err)
 	}
 
-	logsDatabase = append(logsDatabase, log)
+	defer rows.Close()
+
+	var sites []Site
+
+	for rows.Next() {
+		var site Site
+
+		err := rows.Scan(&site.Uuid, &site.Nome, &site.Url)
+
+		if err != nil {
+			return nil, fmt.Errorf("erro ao escanear site: %w", err)
+		}
+
+		sites = append(sites, site)
+	}
+
+	return sites, nil
 }
 
-func ListarLogsDeUmSiteNoBanco(siteUuid string) []Log {
+func CriarLogNoBanco(siteUuid string, texto string) error {
+	sql := `INSERT INTO logs (site_uuid, texto) VALUES (?, ?)`
+
+	_, err := db.Exec(sql, siteUuid, texto)
+
+	if err != nil {
+		return fmt.Errorf("erro ao criar log: %w", err)
+	}
+
+	return nil
+}
+
+func ListarLogsDeUmSiteNoBanco(siteUuid string) ([]Log, error) {
+	sql := `SELECT site_uuid, texto FROM logs WHERE site_uuid = ?`
+
+	rows, err := db.Query(sql, siteUuid)
+
+	if err != nil {
+		return nil, fmt.Errorf("erro ao listar logs: %w", err)
+	}
+
+	defer rows.Close()
+
 	var logs []Log
 
-	for _, log := range logsDatabase {
-		if log.SiteUuid == siteUuid {
-			logs = append(logs, log)
+	for rows.Next() {
+		var log Log
+
+		err := rows.Scan(&log.SiteUuid, &log.Texto)
+
+		if err != nil {
+			return nil, fmt.Errorf("erro ao escanear log: %w", err)
 		}
+
+		logs = append(logs, log)
 	}
 
-	return logs
+	return logs, nil
 }
