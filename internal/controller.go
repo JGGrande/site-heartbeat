@@ -1,13 +1,14 @@
 package internal
 
 import (
+	"encoding/json"
 	"log"
 	"net/http"
 	"text/template"
 )
 
 func RenderHome(w http.ResponseWriter, r *http.Request) {
-	tmpl, err := template.ParseFiles("templates/home.html")
+	tmpl, err := template.ParseFiles("resources/html/home.html")
 
 	if err != nil {
 		http.Error(w, "Erro ao carregar o template", http.StatusInternalServerError)
@@ -39,6 +40,44 @@ func RenderHome(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func CriarMonitoramento(w http.ResponseWriter, r *http.Request) {
+	type NovoSiteRequest struct {
+		Nome string `json:"nome"`
+		URL  string `json:"url"`
+	}
+
+	if r.Method != http.MethodPost {
+		http.Error(w, "Método não permitido", http.StatusMethodNotAllowed)
+		return
+	}
+
+	var req NovoSiteRequest
+
+	err := json.NewDecoder(r.Body).Decode(&req)
+
+	if err != nil {
+		http.Error(w, "Dados inválidos no corpo da requisição", http.StatusBadRequest)
+		return
+	}
+
+	defer r.Body.Close()
+
+	if req.Nome == "" || req.URL == "" {
+		http.Error(w, "Campos 'nome' e 'url' são obrigatórios", http.StatusBadRequest)
+		return
+	}
+
+	err = RegistrarNovoSiteHandler(req.Nome, req.URL)
+
+	if err != nil {
+		http.Error(w, "Erro ao registrar o site", http.StatusInternalServerError)
+		log.Println("Erro ao registrar o site:", err)
+		return
+	}
+
+	w.WriteHeader(http.StatusCreated)
+}
+
 func PararMonitoramento(w http.ResponseWriter, r *http.Request) {
 	siteUuid := r.URL.Query().Get("site")
 
@@ -47,7 +86,7 @@ func PararMonitoramento(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	ExcluirMonitoramento(siteUuid)
+	ExcluirMonitoramentoHandler(siteUuid)
 
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }

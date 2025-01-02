@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Site HeartBeat</title>
+    <link rel="stylesheet" href="/static/css/home.css">
+    <script defer src="/static/scripts/home.js"></script>
+</head>
+<body>
+    <h1>Sites Monitorados</h1>
+    
+    <button class="add-site-button" id="open-modal-button">Adicionar Site</button>
+    
+    <div class="container">
+        {{range $site := .Sites}}
+        <div class="card">
+            <p>{{$site.Nome}}</p>
+            <a href="{{$site.Url}}" target="_blank">Acessar {{$site.Nome}}</a>
+        </div>
+        {{end}}
+    </div>
+
+    <div class="modal" id="site-modal">
+        <div class="modal-content">
+            <button class="modal-close" id="close-modal-button">&times;</button>
+            <h2>Adicionar Novo Site</h2>
+            <input type="text" id="site-name" placeholder="Nome do Site" required>
+            <input type="url" id="site-url" placeholder="URL do Site" required>
+            <button id="submit-button">Enviar</button>
+        </div>
+    </div>
+</body>
+</html>

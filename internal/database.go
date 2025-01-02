@@ -40,7 +40,7 @@ func IniciarBancoDeDados(caminho string) error {
 	return nil
 }
 
-func CriarSiteNoBanco(nome string, url string) (string, error) {
+func CriarSiteNoBanco(nome string, url string) (Site, error) {
 	uuid := uuid.New().String()
 
 	sql := `INSERT INTO sites (uuid, nome, url) VALUES (?, ?, ?)`
@@ -48,10 +48,16 @@ func CriarSiteNoBanco(nome string, url string) (string, error) {
 	_, err := db.Exec(sql, uuid, nome, url)
 
 	if err != nil {
-		return "", fmt.Errorf("erro ao criar site: %w", err)
+		return Site{}, fmt.Errorf("erro ao criar site: %w", err)
 	}
 
-	return uuid, nil
+	novoSite := Site{
+		Uuid: uuid,
+		Nome: nome,
+		Url:  url,
+	}
+
+	return novoSite, nil
 }
 
 func ListarSitesDoBanco() ([]Site, error) {

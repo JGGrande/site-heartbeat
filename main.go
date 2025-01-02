@@ -9,9 +9,13 @@ import (
 func main() {
 	internal.IniciarBancoDeDados("sitehb.db")
 
-	internal.IniciarMonitores()
+	internal.IniciarMonitoresHandler()
+
+	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("resources"))))
 
 	http.HandleFunc("/", internal.RenderHome)
+
+	http.HandleFunc("/criar-monitoramento", internal.CriarMonitoramento)
 
 	http.HandleFunc("/parar-monitoramento", internal.PararMonitoramento)
 

@@ -10,17 +10,32 @@ var (
 	mutex              sync.Mutex
 )
 
-func RegistrarNovoSite(nome, url string) {
-	siteUuid, err := CriarSiteNoBanco(nome, url)
+func RegistrarNovoSiteHandler(nome, url string) error {
+	site, err := CriarSiteNoBanco(nome, url)
 
 	if err != nil {
-		panic(err)
+		return err
 	}
 
-	go MonitorarSite(siteUuid, url, nome)
+	stopChan := make(chan bool)
+	monitoramentoAtivo[site.Uuid] = stopChan
+
+	go func() {
+		fmt.Printf("Monitorando o site %s [uuid] %s\n", site.Nome, site.Uuid)
+
+		select {
+		case <-stopChan:
+			fmt.Printf("Monitoramento do site %s encerrado.\n", site.Nome)
+			return
+		default:
+			MonitorarSite(site.Uuid, site.Url, site.Nome)
+		}
+	}()
+
+	return nil
 }
 
-func ConsultarLogDeUmSite(siteUuid string) []string {
+func ConsultarLogDeUmSiteHandler(siteUuid string) []string {
 	logs, err := ListarLogsDeUmSiteNoBanco(siteUuid)
 
 	if err != nil {
@@ -36,7 +51,7 @@ func ConsultarLogDeUmSite(siteUuid string) []string {
 	return logsFormatados
 }
 
-func IniciarMonitores() {
+func IniciarMonitoresHandler() {
 	sites, err := ListarSitesDoBanco()
 
 	if err != nil {
@@ -73,7 +88,7 @@ func IniciarMonitores() {
 	}
 }
 
-func ExcluirMonitoramento(siteUuid string) {
+func ExcluirMonitoramentoHandler(siteUuid string) {
 	mutex.Lock()
 	defer mutex.Unlock()
 
