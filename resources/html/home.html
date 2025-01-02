@@ -15,8 +15,9 @@
     <div class="container">
         {{range $site := .Sites}}
         <div class="card">
-            <p>{{$site.Nome}}</p>
-            <a href="{{$site.Url}}" target="_blank">Acessar {{$site.Nome}}</a>
+            <h2>{{$site.Nome}}</h2>
+            <a href="/historico/{{$site.Uuid}}" class="btn btn-filled">Ver histórico</a>
+            <a href="{{$site.Url}}" class="btn btn-outline" target="_blank">Acessar site</a>
         </div>
         {{end}}
     </div>
@@ -24,9 +25,12 @@
     <div class="modal" id="site-modal">
         <div class="modal-content">
             <button class="modal-close" id="close-modal-button">&times;</button>
+            
             <h2>Adicionar Novo Site</h2>
+
             <input type="text" id="site-name" placeholder="Nome do Site" required>
             <input type="url" id="site-url" placeholder="URL do Site" required>
+            
             <button id="submit-button">Enviar</button>
         </div>
     </div>

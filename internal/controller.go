@@ -67,6 +67,13 @@ func CriarMonitoramento(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	siteExiste := VerificarSeSiteExisteHandler(req.URL)
+
+	if !siteExiste {
+		http.Error(w, "URL inválida.", http.StatusBadRequest)
+		return
+	}
+
 	err = RegistrarNovoSiteHandler(req.Nome, req.URL)
 
 	if err != nil {

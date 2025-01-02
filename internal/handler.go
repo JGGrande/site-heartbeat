@@ -2,6 +2,7 @@ package internal
 
 import (
 	"fmt"
+	"net/http"
 	"sync"
 )
 
@@ -33,6 +34,20 @@ func RegistrarNovoSiteHandler(nome, url string) error {
 	}()
 
 	return nil
+}
+
+func VerificarSeSiteExisteHandler(url string) bool {
+	res, err := http.Get(url)
+
+	if err != nil {
+		return false
+	}
+
+	if res.StatusCode == 200 {
+		return true
+	}
+
+	return false
 }
 
 func ConsultarLogDeUmSiteHandler(siteUuid string) []string {

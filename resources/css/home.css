@@ -28,26 +28,52 @@ h1 {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     border-radius: 8px;
     margin: 10px;
-    padding: 20px;
+    padding: 24px;
     width: 250px;
     text-align: center;
     transition: transform 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
 }
 
-.card:hover {
-    transform: translateY(-5px);
+.card h2 {
+    margin-bottom: 8px;
 }
 
 .card a {
     text-decoration: none;
-    color: #007BFF;
-    font-weight: bold;
-    display: block;
-    margin-top: 10px;
 }
 
-.card a:hover {
-    text-decoration: underline;
+.card .btn {
+    padding: 10px 20px;
+    font-size: 14px;
+    font-weight: bold;
+    border-radius: 4px;
+    cursor: pointer;
+    text-align: center;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.card .btn-filled {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+}
+
+.card .btn-filled:hover {
+    background-color: #0056b3;
+}
+
+.card .btn-outline {
+    background-color: transparent;
+    color: #007bff;
+    border: 2px solid #007bff;
+}
+
+.card .btn-outline:hover {
+    background-color: #007bff;
+    color: #fff;
 }
 
 .add-site-button {
@@ -78,6 +104,10 @@ h1 {
     justify-content: center;
     align-items: center;
     z-index: 1000;
+}
+
+.modal h2 {
+    margin-bottom: 16px;
 }
 
 .modal.active {
