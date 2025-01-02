@@ -82,6 +82,26 @@ func ListarSitesDoBanco() ([]Site, error) {
 	return sites, nil
 }
 
+func ExcluirSiteDoBanco(siteUuid string) error {
+	sql := `DELETE FROM logs WHERE site_uuid = ?`
+
+	_, err := db.Exec(sql, siteUuid)
+
+	if err != nil {
+		return fmt.Errorf("erro ao excluir logs: %w", err)
+	}
+
+	sql = `DELETE FROM sites WHERE uuid = ?`
+
+	_, err = db.Exec(sql, siteUuid)
+
+	if err != nil {
+		return fmt.Errorf("erro ao excluir site: %w", err)
+	}
+
+	return nil
+}
+
 func CriarLogNoBanco(siteUuid string, texto string) error {
 	sql := `INSERT INTO logs (site_uuid, texto) VALUES (?, ?)`
 
