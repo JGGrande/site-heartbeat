@@ -37,15 +37,28 @@
             });
 
             if (response.status === 201) {
-                alert('Site adicionado com sucesso!');
-                $modal.classList.remove('active');
-                location.reload();
+                Swal.fire({
+                    title: "Criado!",
+                    text: "Site criado com sucesso!",
+                    icon: "success"
+                }).then(() => {
+                    $modal.classList.remove('active');
+                    location.reload();
+                });
             } else {
-                alert('Ocorreu um erro ao adicionar o site.');
+                Swal.fire({
+                    title: "Erro!",
+                    text: "Erro ao deletar site!",
+                    icon: "error"
+                });
             }
         } catch (error) {
             console.error('Erro ao enviar requisição:', error);
-            alert('Erro ao conectar-se ao servidor.');
+            Swal.fire({
+                title: "Erro!",
+                text: "Erro ao deletar site!",
+                icon: "error"
+            });
         }
     });
 })()
