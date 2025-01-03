@@ -98,7 +98,7 @@ func PararMonitoramento(w http.ResponseWriter, r *http.Request) {
 
 	ExcluirMonitoramentoHandler(siteUuid)
 
-	http.Redirect(w, r, "/", http.StatusSeeOther)
+	w.WriteHeader(http.StatusOK)
 }
 
 func RenderHistorico(w http.ResponseWriter, r *http.Request) {

@@ -10,7 +10,10 @@
     <div class="container">
         <h1>Histórico de Monitoramento</h1>
 
-        <button id="toggleButton" class="toggle-button" onclick="toggleContent()">Mostrar texto</button>
+        <div class="btn-container">
+            <button id="deleteButton" class="delete-button" onclick="deleteSite()">Excluir site</button>
+            <button id="toggleButton" class="toggle-button" onclick="toggleContent()">Mostrar texto</button>
+        </div>
 
         <div id="chartContainer" class="chart-container">
             <h2 class="chart-title">Heartbeat de Atividade</h2>
@@ -31,6 +34,7 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         let labels = `{{range $data := .DataLabels}}{{$data}};{{end}}`;
         labels = labels
@@ -110,6 +114,51 @@
                 $toggleButton.textContent = "Mostrar gráfico";
             }
         }
+
+        function deleteSite() {
+            Swal.fire({
+                title: "Deseja deletar site?",
+                text: "O Site e todo seu histórico serão removidos para sempre!",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#d33",
+                cancelButtonColor: "gray",
+                confirmButtonText: "Sim, apagar!",
+                cancelButtonText: "Cancelar"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const siteUuid = window.location.pathname.split("/")[2];
+
+                    const protocol = window.location.protocol;
+                    const port = window.location.port || "80";
+                    const apiUrl = `${protocol}//${window.location.hostname}:${port}/parar-monitoramento?site=${siteUuid}`;
+
+                    fetch(apiUrl)
+                    .then((response) => {
+                        if (response.status !== 200) {
+                            throw new Error("Erro ao deletar site!");
+                        }
+
+                        Swal.fire({
+                            title: "Deletado!",
+                            text: "Site deletado com sucesso!",
+                            icon: "success"
+                        }).then(() => {
+                            window.location.href = "/"
+                        })
+                    })
+                    .catch((error) => {
+                        Swal.fire({
+                            title: "Erro!",
+                            text: error.message,
+                            icon: "error"
+                        });
+                    });
+
+                }
+            });
+        }
+
     </script>
 </body>
 </html>

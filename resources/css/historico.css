@@ -45,6 +45,30 @@ h1 {
 .logs-container {
     display: none;
 }
+
+.btn-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.delete-button {
+    display: block;
+    margin: 20px auto;
+    padding: 10px 20px;
+    background-color: #d33;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px; 
+}
+
+.delete-button:hover {
+    background-color: darkred;
+}
+
 .toggle-button {
     display: block;
     margin: 20px auto;
