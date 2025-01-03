@@ -13,11 +13,13 @@ func main() {
 
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("resources"))))
 
-	http.HandleFunc("/", internal.RenderHome)
-
 	http.HandleFunc("/criar-monitoramento", internal.CriarMonitoramento)
 
+	http.HandleFunc("/historico/", internal.RenderHistorico)
+
 	http.HandleFunc("/parar-monitoramento", internal.PararMonitoramento)
+
+	http.HandleFunc("/", internal.RenderHome)
 
 	log.Println("Servidor iniciado em http://localhost:8080")
 

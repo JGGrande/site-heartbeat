@@ -2,9 +2,12 @@ package internal
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
+	"strings"
 	"text/template"
+	"time"
 )
 
 func RenderHome(w http.ResponseWriter, r *http.Request) {
@@ -96,4 +99,70 @@ func PararMonitoramento(w http.ResponseWriter, r *http.Request) {
 	ExcluirMonitoramentoHandler(siteUuid)
 
 	http.Redirect(w, r, "/", http.StatusSeeOther)
+}
+
+func RenderHistorico(w http.ResponseWriter, r *http.Request) {
+	siteUuid := strings.TrimPrefix(r.URL.Path, "/historico/")
+
+	if siteUuid == "" {
+		http.Error(w, "UUID inválido", http.StatusBadRequest)
+		return
+	}
+
+	tmpl, err := template.ParseFiles("resources/html/historico.html")
+
+	if err != nil {
+		http.Error(w, "Erro ao carregar o template", http.StatusInternalServerError)
+		log.Println("Erro ao carregar o template:", err)
+		return
+	}
+
+	logs, err := ListarLogsDeUmSiteNoBanco(siteUuid)
+
+	if err != nil {
+		http.Error(w, "Erro ao listar os logs", http.StatusNotFound)
+		log.Println("Erro ao listar os logs:", err)
+		return
+	}
+
+	type HistoricoTemplateData struct {
+		Logs       []Log
+		DataLabels []string
+		DataPoints []int
+	}
+
+	var labels []string
+	var data []int
+
+	for _, log := range logs {
+		t, err := time.Parse("02/01/2006 15:04:05", log.Data)
+
+		if err != nil {
+			fmt.Println("Erro ao processar data:", err)
+			continue
+		}
+
+		label := t.Format("2006-01-02 15:04:05")
+
+		labels = append(labels, label)
+
+		if log.Ativo {
+			data = append(data, 100)
+		} else {
+			data = append(data, 0)
+		}
+	}
+
+	templateData := HistoricoTemplateData{
+		Logs:       logs,
+		DataLabels: labels,
+		DataPoints: data,
+	}
+
+	err = tmpl.Execute(w, templateData)
+
+	if err != nil {
+		http.Error(w, "Erro ao renderizar o template", http.StatusInternalServerError)
+		log.Println("Erro ao renderizar o template:", err)
+	}
 }

@@ -32,7 +32,7 @@ func MonitorarSite(siteUuid string, url string, nome string) {
 
 		textoLog := fmt.Sprintf("[%s] - está %s", dataAtualFormatada, status)
 
-		CriarLogNoBanco(siteUuid, textoLog)
+		CriarLogNoBanco(siteUuid, textoLog, estaOnline, dataAtualFormatada)
 
 		time.Sleep(delay)
 	}

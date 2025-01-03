@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Histórico de Monitoramento</title>
+    <link rel="stylesheet" href="/static/css/historico.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Histórico de Monitoramento</h1>
+
+        <button id="toggleButton" class="toggle-button" onclick="toggleContent()">Mostrar texto</button>
+
+        <div id="chartContainer" class="chart-container">
+            <h2 class="chart-title">Heartbeat de Atividade</h2>
+            <canvas id="heartbeatChart"></canvas>
+        </div>
+
+        <div id="logsContainer" class="logs-container">
+            {{range $log := .Logs}}
+                <div class="log">
+                    <p>{{$log.Texto}}</p>
+                </div>
+            {{end}}
+        </div>
+
+        <div class="footer">
+            <p>&copy; 2025 Monitoramento de Sistema</p>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        let labels = `{{range $data := .DataLabels}}{{$data}};{{end}}`;
+        labels = labels
+            .replace(/[\[\] ]+/g, ' ')
+            .split(';')
+            .map((date) => new Date(date))
+            .filter((date) => !isNaN(date))
+            .map(date => date.toLocaleString('pt-BR', { hour: 'numeric', minute: 'numeric', second: 'numeric' }));
+
+        let data = "{{range $data := .DataPoints}}{{$data}};{{end}}";
+        data = data
+            .replace(/\[|\]/g, '')
+            .split(';')
+            .map(Number)
+            .filter((value) => !isNaN(value));
+
+        const activityData = {
+            labels: labels,
+            datasets: [{
+                label: 'Heartbeat Activity',
+                data: data,
+                borderColor: 'rgba(76, 175, 80, 1)',
+                backgroundColor: 'rgba(76, 175, 80, 0.2)',
+                fill: true,
+                tension: 0.4
+            }]
+        };
+
+        const config = {
+            type: 'line',
+            data: activityData,
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: (tooltipItem) => `${tooltipItem.dataset.label}: ${tooltipItem.raw}%`,
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Data'
+                        }
+                    },
+                    y: {
+                        min: 0,
+                        max: 100,
+                        title: {
+                            display: true,
+                            text: 'Atividade (%)'
+                        }
+                    }
+                }
+            }
+        };
+
+        const heartbeatChart = new Chart(document.querySelector('#heartbeatChart').getContext('2d'), config);
+
+        function toggleContent() {
+            const $chartContainer = document.querySelector('#chartContainer');
+            const $logsContainer = document.querySelector('#logsContainer');
+            const $toggleButton = document.querySelector('#toggleButton');
+
+            if ($chartContainer.style.display === "none") {
+                $chartContainer.style.display = "block";
+                $logsContainer.style.display = "none";
+                $toggleButton.textContent = "Mostrar texto";
+            } else {
+                $chartContainer.style.display = "none";
+                $logsContainer.style.display = "block";
+                $toggleButton.textContent = "Mostrar gráfico";
+            }
+        }
+    </script>
+</body>
+</html>

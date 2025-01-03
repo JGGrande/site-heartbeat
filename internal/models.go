@@ -9,4 +9,6 @@ type Site struct {
 type Log struct {
 	SiteUuid string
 	Texto    string
+	Ativo    bool
+	Data     string
 }

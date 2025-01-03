@@ -29,6 +29,8 @@ func IniciarBancoDeDados(caminho string) error {
 		id INTEGER PRIMARY KEY AUTOINCREMENT,
 		site_uuid TEXT NOT NULL,
 		texto TEXT NOT NULL,
+		ativo BOOLEAN NOT NULL,
+		data TEXT NOT NULL,
 		FOREIGN KEY(site_uuid) REFERENCES sites(uuid)
 	);`
 
@@ -108,10 +110,10 @@ func ExcluirSiteDoBanco(siteUuid string) error {
 	return nil
 }
 
-func CriarLogNoBanco(siteUuid string, texto string) error {
-	sql := `INSERT INTO logs (site_uuid, texto) VALUES (?, ?)`
+func CriarLogNoBanco(siteUuid string, texto string, ativo bool, data string) error {
+	sql := `INSERT INTO logs (site_uuid, texto, ativo, data) VALUES (?, ?, ?, ?)`
 
-	_, err := db.Exec(sql, siteUuid, texto)
+	_, err := db.Exec(sql, siteUuid, texto, ativo, data)
 
 	if err != nil {
 		return fmt.Errorf("erro ao criar log: %w", err)
@@ -121,7 +123,12 @@ func CriarLogNoBanco(siteUuid string, texto string) error {
 }
 
 func ListarLogsDeUmSiteNoBanco(siteUuid string) ([]Log, error) {
-	sql := `SELECT site_uuid, texto FROM logs WHERE site_uuid = ?`
+	sql := `
+		SELECT site_uuid, texto, ativo, data 
+		FROM logs
+		WHERE site_uuid = ?
+		ORDER By texto ASC
+	`
 
 	rows, err := db.Query(sql, siteUuid)
 
@@ -136,7 +143,7 @@ func ListarLogsDeUmSiteNoBanco(siteUuid string) ([]Log, error) {
 	for rows.Next() {
 		var log Log
 
-		err := rows.Scan(&log.SiteUuid, &log.Texto)
+		err := rows.Scan(&log.SiteUuid, &log.Texto, &log.Ativo, &log.Data)
 
 		if err != nil {
 			return nil, fmt.Errorf("erro ao escanear log: %w", err)
