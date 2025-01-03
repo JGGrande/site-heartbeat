@@ -7,13 +7,14 @@ body {
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
-    background-color: #f4f4f9;
+    background-color: #f4f7fa;
     color: #333;
 }
 
 h1 {
     text-align: center;
     margin-top: 20px;
+    color: #4CAF50;
 }
 
 .container {
@@ -39,6 +40,7 @@ h1 {
 
 .card h2 {
     margin-bottom: 8px;
+    color: #4CAF50;
 }
 
 .card a {
@@ -56,23 +58,23 @@ h1 {
 }
 
 .card .btn-filled {
-    background-color: #007bff;
+    background-color: #4CAF50;
     color: #fff;
     border: none;
 }
 
 .card .btn-filled:hover {
-    background-color: #0056b3;
+    background-color: #45a049;
 }
 
 .card .btn-outline {
     background-color: transparent;
-    color: #007bff;
-    border: 2px solid #007bff;
+    color: #4CAF50;
+    border: 2px solid #4CAF50;
 }
 
 .card .btn-outline:hover {
-    background-color: #007bff;
+    background-color: #4CAF50;
     color: #fff;
 }
 
@@ -80,7 +82,7 @@ h1 {
     display: block;
     margin: 20px auto;
     padding: 10px 20px;
-    background-color: #28a745;
+    background-color: #4CAF50;
     color: #fff;
     font-weight: bold;
     border: none;
@@ -90,7 +92,7 @@ h1 {
 }
 
 .add-site-button:hover {
-    background-color: #218838;
+    background-color: #45a049;
 }
 
 .modal {
@@ -108,6 +110,7 @@ h1 {
 
 .modal h2 {
     margin-bottom: 16px;
+    color: #4CAF50;
 }
 
 .modal.active {
@@ -133,7 +136,7 @@ h1 {
 
 .modal-content button {
     padding: 10px 20px;
-    background-color: #007bff;
+    background-color: #4CAF50;
     color: white;
     border: none;
     border-radius: 4px;
@@ -141,7 +144,7 @@ h1 {
 }
 
 .modal-content button:hover {
-    background-color: #0056b3;
+    background-color: #45a049;
 }
 
 .modal-close {
